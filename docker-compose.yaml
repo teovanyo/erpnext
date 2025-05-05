@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  mariadb:
+    image: mariadb:10.6
+    environment:
+      MYSQL_ROOT_PASSWORD: yourmysqlpassword
+      MYSQL_DATABASE: erpnext
+      MYSQL_USER: frappe
+      MYSQL_PASSWORD: frappe
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    restart: always
+
+  erpnext:
+    image: teovanyo/erpnext:v15.5.0
+    depends_on:
+      - mariadb
+    ports:
+      - "80:80"
+    environment:
+      - SITE_NAME=erpnext.stealthagents.us
+      - DB_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=yourmysqlpassword
+      - ADMIN_PASSWORD=admin
+      - INSTALL_APPS=erpnext
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - MYSQL_USER=frappe
+      - MYSQL_PASSWORD=frappe
+    volumes:
+      - sites-vol:/home/frappe/frappe-bench/sites
+      - logs-vol:/home/frappe/frappe-bench/logs
+    restart: always
+
+volumes:
+  sites-vol:
+  logs-vol:
+  mariadb_data:
